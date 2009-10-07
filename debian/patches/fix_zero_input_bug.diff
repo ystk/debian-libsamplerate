@@ -1,0 +1,151 @@
+From: Erik de Castro Lopo <erikd@mega-nerd.com>
+Date: Wed,  7 Oct 2009 21:19:34 +1100
+Subject: src_simple() causes a crash with certain inputs
+Origin: upstream
+Bug-Debian: http://bugs.debian.org/506722
+
+Index: libsamplerate-0.1.7/src/src_linear.c
+===================================================================
+--- libsamplerate-0.1.7.orig/src/src_linear.c
++++ libsamplerate-0.1.7/src/src_linear.c
+@@ -51,20 +51,23 @@ typedef struct
+ 
+ /*----------------------------------------------------------------------------------------
+ */
+ 
+ static int
+ linear_vari_process (SRC_PRIVATE *psrc, SRC_DATA *data)
+ {	LINEAR_DATA *priv ;
+ 	double		src_ratio, input_index, rem ;
+ 	int			ch ;
+ 
++	if (data->input_frames <= 0)
++		return SRC_ERR_NO_ERROR ;
++
+ 	if (psrc->private_data == NULL)
+ 		return SRC_ERR_NO_PRIVATE ;
+ 
+ 	priv = (LINEAR_DATA*) psrc->private_data ;
+ 
+ 	if (priv->reset)
+ 	{	/* If we have just been reset, set the last_value data. */
+ 		for (ch = 0 ; ch < priv->channels ; ch++)
+ 			priv->last_value [ch] = data->data_in [ch] ;
+ 		priv->reset = 0 ;
+Index: libsamplerate-0.1.7/src/src_zoh.c
+===================================================================
+--- libsamplerate-0.1.7.orig/src/src_zoh.c
++++ libsamplerate-0.1.7/src/src_zoh.c
+@@ -49,20 +49,23 @@ typedef struct
+ 
+ /*----------------------------------------------------------------------------------------
+ */
+ 
+ static int
+ zoh_vari_process (SRC_PRIVATE *psrc, SRC_DATA *data)
+ {	ZOH_DATA 	*priv ;
+ 	double		src_ratio, input_index, rem ;
+ 	int			ch ;
+ 
++	if (data->input_frames <= 0)
++		return SRC_ERR_NO_ERROR ;
++
+ 	if (psrc->private_data == NULL)
+ 		return SRC_ERR_NO_PRIVATE ;
+ 
+ 	priv = (ZOH_DATA*) psrc->private_data ;
+ 
+ 	if (priv->reset)
+ 	{	/* If we have just been reset, set the last_value data. */
+ 		for (ch = 0 ; ch < priv->channels ; ch++)
+ 			priv->last_value [ch] = data->data_in [ch] ;
+ 		priv->reset = 0 ;
+Index: libsamplerate-0.1.7/tests/misc_test.c
+===================================================================
+--- libsamplerate-0.1.7.orig/tests/misc_test.c
++++ libsamplerate-0.1.7/tests/misc_test.c
+@@ -20,35 +20,41 @@
+ #include <stdlib.h>
+ #include <string.h>
+ 
+ #include <samplerate.h>
+ 
+ #include "util.h"
+ 
+ static void name_test (void) ;
+ static void error_test (void) ;
+ static void src_ratio_test (void) ;
++static void zero_input_test (int converter) ;
+ 
+ int
+ main (void)
+ {
+ 	puts ("") ;
+ 
+ 	printf ("    version : %s\n\n", src_get_version ()) ;
+ 
+ 	/* Current max converter is SRC_LINEAR. */
+ 	name_test () ;
+ 
+ 	error_test () ;
+ 
+ 	src_ratio_test () ;
+ 
++	zero_input_test (SRC_ZERO_ORDER_HOLD) ;
++	zero_input_test (SRC_LINEAR) ;
++	zero_input_test (SRC_SINC_FASTEST) ;
++
++	puts ("") ;
+ 	return 0 ;
+ } /* main */
+ 
+ static void
+ name_test (void)
+ {	const char	*name ;
+ 	int	k = 0 ;
+ 
+ 	puts ("    name_test :") ;
+ 
+@@ -128,10 +134,42 @@ error_test (void)
+ 
+ 	if (errors != 0)
+ 	{	printf ("\n\nLine %d : Missing error numbers above.\n\n", __LINE__) ;
+ 		exit (1) ;
+ 		} ;
+ 
+ 	puts ("") ;
+ 
+ 	return ;
+ } /* error_test */
++
++static void
++zero_input_test (int converter)
++{	SRC_DATA data ;
++	SRC_STATE *state ;
++	float out [100] ;
++	int error ;
++
++	printf ("    %s (%-26s) ........ ", __func__, src_get_name (converter)) ;
++	fflush (stdout) ;
++
++	if ((state = src_new (converter, 1, &error)) == NULL)
++	{	printf ("\n\nLine %d : src_new failed : %s.\n\n", __LINE__, src_strerror (error)) ;
++		exit (1) ;
++		} ;
++
++	data.data_in = (float *) 0xdeadbeef ;
++	data.input_frames = 0 ;
++	data.data_out = out ;
++	data.output_frames = ARRAY_LEN (out) ;
++	data.end_of_input = 0 ;
++	data.src_ratio = 1.0 ;
++
++	if ((error = src_process (state, &data)))
++	{	printf ("\n\nLine %d : src_new failed : %s.\n\n", __LINE__, src_strerror (error)) ;
++		exit (1) ;
++		} ;
++
++	state = src_delete (state) ;
++
++	puts ("ok") ;
++} /* zero_input_test */
