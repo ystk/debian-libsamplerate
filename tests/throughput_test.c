@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2004-2008 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2004-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -94,7 +94,7 @@ throughput_test (int converter, long best_throughput)
 	{	best_throughput = MAX (throughput, best_throughput) ;
 		printf ("%5.2f          %10ld       %10ld\n", duration, throughput, best_throughput) ;
 		}
-		
+
 
 	return best_throughput ;
 } /* throughput_test */
@@ -103,8 +103,7 @@ static void
 single_run (void)
 {
 
-	printf ("\n    CPU : ") ;
-	print_cpu_name () ;
+	printf ("\n    CPU name : %s\n", get_cpu_name ()) ;
 
 	puts (
 		"\n"
@@ -147,8 +146,7 @@ multi_run (int run_count)
 		sleep (10) ;
 		} ;
 
-	printf ("\n    CPU name : ") ;
-	print_cpu_name () ;
+	printf ("\n    CPU name : %s\n", get_cpu_name ()) ;
 
 	puts (
 		"\n"
