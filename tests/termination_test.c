@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2008 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@
 #define	SHORT_BUFFER_LEN	2048
 #define	LONG_BUFFER_LEN		((1 << 16) - 20)
 
+static void simple_test (int converter) ;
 static void stream_test (int converter, double ratio) ;
 static void init_term_test (int converter, double ratio) ;
 
@@ -67,8 +68,36 @@ main (void)
 
 	puts ("") ;
 
+	simple_test (SRC_SINC_FASTEST) ;
+
 	return 0 ;
 } /* main */
+
+static void
+simple_test (int converter)
+{
+	int ilen = 199030, olen = 1000, error ;
+
+	{
+		float in [ilen] ;
+		float out [olen] ;
+		double ratio = (1.0 * olen) / ilen ;
+		SRC_DATA src_data =
+		{	in, out,
+			ilen, olen,
+			0, 0, 0,
+			ratio
+		} ;
+
+		error = src_simple (&src_data, converter, 1) ;
+		if (error)
+		{	printf ("\n\nLine %d : %s\n\n", __LINE__, src_strerror (error)) ;
+			exit (1) ;
+			} ;
+	} ;
+
+    return ;
+} /* simple_test */
 
 static void
 init_term_test (int converter, double src_ratio)

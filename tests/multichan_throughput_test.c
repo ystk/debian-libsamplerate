@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2008 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2008-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -103,8 +103,7 @@ single_run (void)
 {	const int max_channels = 10 ;
 	int k ;
 
-	printf ("\n    CPU : ") ;
-	print_cpu_name () ;
+	printf ("\n    CPU name : %s\n", get_cpu_name ()) ;
 
 	puts (
 		"\n"
@@ -131,8 +130,7 @@ static void
 multi_run (int run_count)
 {	int k, ch ;
 
-	printf ("\n    CPU name : ") ;
-	print_cpu_name () ;
+	printf ("\n    CPU name : %s\n", get_cpu_name ()) ;
 
 	puts (
 		"\n"

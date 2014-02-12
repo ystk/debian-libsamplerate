@@ -1,3 +1,52 @@
+libsamplerate (0.1.8-5) unstable; urgency=low
+
+  * debian/rules: Purge *.la files after install.
+  * debian/libsamplerate0-dev.install: Don't install *.la files.
+  * debian/control: Standards version 3.9.3. No changes needed.
+
+ -- Erik de Castro Lopo <erikd@mega-nerd.com>  Mon, 18 Jun 2012 19:39:35 +1000
+
+libsamplerate (0.1.8-4) unstable; urgency=low
+
+  * debian/control:
+    - Standards version 3.9.2 (no changes needed).
+    - Use Replaces instead of Replaces/Breaks (Closes: #657414).
+
+ -- Erik de Castro Lopo <erikd@mega-nerd.com>  Sun, 11 Mar 2012 16:39:18 +1100
+
+libsamplerate (0.1.8-3) unstable; urgency=low
+
+  * samplerate-programs Fix Replaces/Breaks libsamplerate0 (<< 0.1.8)
+    (Closes: #657414).
+
+ -- Erik de Castro Lopo <erikd@mega-nerd.com>  Sun, 19 Feb 2012 10:52:28 +1100
+
+libsamplerate (0.1.8-2) unstable; urgency=low
+
+  * Enabling harden build flags.
+  * samplerate-programs Replaces/Breaks libsamplerate0 (<< 0.1.8)
+    (Closes: #657414:).
+
+ -- Erik de Castro Lopo <erikd@mega-nerd.com>  Fri, 27 Jan 2012 20:07:43 +1100
+
+libsamplerate (0.1.8-1) unstable; urgency=low
+
+  * New upstream (Closes: #637691).
+  * debian/patches/ : Remove uneeded patches (fixed upstream).
+  * debian/control : Remove quilt from build-deps.
+
+ -- Erik de Castro Lopo <erikd@mega-nerd.com>  Tue, 16 Aug 2011 18:32:49 +1000
+
+libsamplerate (0.1.7-4) unstable; urgency=low
+
+  * Patch from Steve Langasek to enable multiarch (Closes: #637588).
+  * debian/control: Standards version 3.9.2 (no changes needed).
+  * debian/rules:
+    - Add build-arch and build-indep targets.
+    - Force clearing of dependency_libs in libsamplerate.la.
+
+ -- Erik de Castro Lopo <erikd@mega-nerd.com>  Sat, 13 Aug 2011 10:09:55 +1000
+
 libsamplerate (0.1.7-3) unstable; urgency=low
 
   * debian/control :

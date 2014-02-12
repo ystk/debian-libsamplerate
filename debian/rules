@@ -5,23 +5,22 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-include /usr/share/quilt/quilt.make
-
 # These are used for cross-compiling and for saving the configure script
 # from having to guess our platform (since we know it already)
 DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+DEB_HOST_MULTIARCH  ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
 
-ifneq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
-	CFLAGS += -g
-endif
 ifeq (,$(findstring nostrip,$(DEB_BUILD_OPTIONS)))
 	INSTALL_PROGRAM += -s
 endif
 
 config.status: configure
 	dh_testdir
-	./configure --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info
+	./configure  $(shell dpkg-buildflags --export=configure) \
+		--host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) \
+		--prefix=/usr --libdir=\$${prefix}/lib/$(DEB_HOST_MULTIARCH) \
+		--mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info
 
 
 build: patch build-stamp
@@ -40,41 +39,43 @@ clean: unpatch
 
 	[ ! -f Makefile ] || $(MAKE) distclean
 
-	dh_clean
+	dh_clean -a
 
 install: build
 	dh_testdir
 	dh_testroot
-	dh_prep
+	dh_prep -a
 	dh_installdirs
 
-	$(MAKE) install prefix=$(CURDIR)/debian/tmp/usr
-	install -D doc/*.html doc/*.png doc/*.css $(CURDIR)/debian/libsamplerate0-dev/usr/share/doc/libsamplerate0-dev/html/
+	$(MAKE) install DESTDIR=$(CURDIR)/debian/tmp
+
+	# Purge *.la files. See: http://wiki.debian.org/ReleaseGoals/LAFileRemoval
+	rm -f debian/tmp/usr/lib/*/*.la
+
 
 binary-indep: build install
+build-arch: build
+build-indep: build
 
 binary-arch: build install
 	dh_testdir
 	dh_testroot
-	dh_install --sourcedir=debian/tmp --list-missing
-
-	# This line can be removed when the man page get pushed upstream.
-	dh_installman -psamplerate-programs debian/sndfile-resample.1
-
-	dh_installdocs -a
-	dh_installexamples
+	dh_install -a --sourcedir=debian/tmp --list-missing
 	dh_installman
-	dh_installchangelogs ChangeLog
-	dh_link
-	dh_strip
-	dh_compress
-	dh_fixperms
-	dh_makeshlibs
-	dh_installdeb
-	dh_shlibdeps
-	dh_gencontrol
-	dh_md5sums
-	dh_builddeb
+	dh_installdocs -a
+	dh_installexamples -a
+	dh_installchangelogs -a ChangeLog
+	dh_strip -a
+	dh_compress -a
+	dh_fixperms -a
+	dh_makeshlibs -plibsamplerate0
+	dh_installdeb -a
+	dh_shlibdeps -a -plibsamplerate0
+	dh_shlibdeps -psamplerate-programs -ldebian/tmp/usr/lib/$(DEB_HOST_MULTIARCH)
+	dh_gencontrol -a
+	dh_md5sums -a
+	dh_builddeb -a
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install patch unpatch
+

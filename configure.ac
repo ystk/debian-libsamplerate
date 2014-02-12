@@ -1,9 +1,10 @@
-# Copyright (C) 2002-2008 Erik de Castro Lopo (erikd AT mega-nerd DOT com).
+# Copyright (C) 2002-2011 Erik de Castro Lopo (erikd AT mega-nerd DOT com).
 
-dnl Require autoconf version >= 2.57)
+dnl Require autoconf version
 AC_PREREQ(2.57)
 
-AC_INIT([libsamplerate],[0.1.7],[erikd@mega-nerd.com])
+AC_INIT([libsamplerate],[0.1.8],[erikd@mega-nerd.com],
+		[libsamplerate],[http://www.mega-nerd.com/libsamplerate/])
 
 # Put config stuff in Cfg.
 AC_CONFIG_AUX_DIR(Cfg)
@@ -12,15 +13,29 @@ AC_CONFIG_SRCDIR([src/samplerate.c])
 AC_CANONICAL_TARGET([])
 
 AC_CONFIG_MACRO_DIR([M4])
+AC_CONFIG_HEADERS([src/config.h])
 
 AM_INIT_AUTOMAKE($PACKAGE_NAME,$PACKAGE_VERSION)
-AC_CONFIG_HEADER(src/config.h)
-
+AM_SILENT_RULES([yes])
 
 dnl Add parameters for aclocal
 AC_SUBST(ACLOCAL_AMFLAGS, "-I M4")
 
 AC_LANG([C])
+
+AC_PROG_CC
+AM_PROG_CC_C_O
+AC_PROG_CXX
+AC_PROG_SED
+
+# Do not check for F77.
+define([AC_LIBTOOL_LANG_F77_CONFIG], [:])dnl
+
+AM_PROG_LIBTOOL
+LT_PROG_RC
+
+AC_PROG_INSTALL
+AC_PROG_LN_S
 
 #------------------------------------------------------------------------------------
 # Rules for library version information:
@@ -38,17 +53,11 @@ AC_LANG([C])
 #  6. If any interfaces have been removed since the last public release, then set age
 #     to 0.
 
-SHARED_VERSION_INFO="1:7:1"
+SHARED_VERSION_INFO="1:8:1"
 
-AC_PROG_CC
-AM_PROG_CC_C_O
 
-# Do not check for F77.
-define([AC_LIBTOOL_LANG_F77_CONFIG], [:])dnl
 
-AM_PROG_LIBTOOL
 
-AC_PROG_INSTALL
 
 AC_PROG_MAKE_SET
 AC_PROG_LN_S
@@ -212,7 +221,8 @@ if test $ac_cv_c_compiler_gnu = yes ; then
 			temp_CFLAGS=`echo $CFLAGS | sed "s/-Wall//"`
 			CFLAGS=$temp_CFLAGS
 			;;
-		linux*)
+
+		linux*|kfreebsd*-gnu*|gnu*)
 			SHLIB_VERSION_ARG="-Wl,--version-script=Version_script"
 			;;
 		*)
@@ -252,10 +262,20 @@ case "$target_os" in
 		;;
 	esac
 
+htmldocdir=$prefix/share/doc/libsamplerate0-dev/html
+
+if test $prefix = "NONE" ; then
+	htmldocdir=/usr/local/share/doc/libsamplerate0-dev/html
+else
+	htmldocdir=$prefix/share/doc/libsamplerate0-dev/html
+	fi
+
 #====================================================================================
 # Now use the information from the checking stage.
 
 AC_DEFINE_UNQUOTED(OS_IS_WIN32, ${os_is_win32}, [Set to 1 if compiling for Win32])
+
+AC_SUBST(htmldocdir)
 
 AC_SUBST(SHLIB_VERSION_ARG)
 AC_SUBST(SHARED_VERSION_INFO)
@@ -273,7 +293,8 @@ AC_SUBST(HAVE_SNDFILE)
 AC_SUBST(SNDFILE_CFLAGS)
 AC_SUBST(SNDFILE_LIBS)
 
-AC_CONFIG_FILES([Makefile src/Version_script Win32/Makefile Win32/Makefile.mingw \
+AC_CONFIG_FILES([Makefile M4/Makefile src/Version_script \
+			Win32/Makefile Win32/Makefile.mingw \
 			src/Makefile examples/Makefile tests/Makefile doc/Makefile \
 			libsamplerate.spec samplerate.pc])
 AC_OUTPUT
@@ -286,6 +307,10 @@ AC_MSG_RESULT([
   Configuration summary :
 
     Version : ..................... ${VERSION}
+
+    Host CPU : .................... ${host_cpu}
+    Host Vendor : ................. ${host_vendor}
+    Host OS : ..................... ${host_os}
 ])
 
 if test x$ac_cv_c_compiler_gnu = xyes ; then
