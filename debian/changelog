@@ -1,3 +1,30 @@
+libsamplerate (0.1.8-8) unstable; urgency=low
+
+  * debian/rules: Regenerate configure if needed. Patch from Svante Signell.
+  * debian/patches/hurd.patch: GNU/Hurd patch from Svante Signell
+    (Closes: 753425).
+  * debian/control: Add quilt to build-deps.
+
+ -- Erik de Castro Lopo <erikd@mega-nerd.com>  Fri,  4 Jul 2014 12:48:46 +1000
+
+libsamplerate (0.1.8-7) unstable; urgency=low
+
+  * debian/rules: Switch from autotools-dev to dh-autoreconf at the suggestion
+    of Steve Langasek. (Closes: 736686).
+
+ -- Erik de Castro Lopo <erikd@mega-nerd.com>  Wed, 29 Jan 2014 18:01:00 +1100
+
+libsamplerate (0.1.8-6) unstable; urgency=low
+
+  [Wookey <wookey@debian.org>]
+  * Ensure config.{sub,guess} up to date for new ports (Closes: #734673).
+
+  [Erik de Castro Lopo]
+  * debian/control:
+    - Standards version 3.9.5. No changes needed.
+
+ -- Erik de Castro Lopo <erikd@mega-nerd.com>  Sun, 19 Jan 2014 21:02:34 +1100
+
 libsamplerate (0.1.8-5) unstable; urgency=low
 
   * debian/rules: Purge *.la files after install.

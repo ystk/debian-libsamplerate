@@ -1,0 +1,19 @@
+From: Svante Signell <svante.signell@gmail.com>
+Subject: Time resolution on GNU/Hurd is 10 msec not 1 usec as for other systems.
+
+Index: libsamplerate-0.1.8/tests/throughput_test.c
+===================================================================
+--- libsamplerate-0.1.8.orig/tests/throughput_test.c
++++ libsamplerate-0.1.8/tests/throughput_test.c
+@@ -67,7 +67,11 @@ throughput_test (int converter, long bes
+ 		total_frames += src_data.output_frames_gen ;
+ 
+ 		clock_time = clock () - start_time ;
++#ifdef __GNU__ /* Clock resolution is 10ms on GNU/Hurd */
++		duration = (10000.0 * clock_time) / CLOCKS_PER_SEC ;
++#else
+ 		duration = (1.0 * clock_time) / CLOCKS_PER_SEC ;
++#endif
+ 	}
+ 	while (duration < 3.0) ;
+ 
