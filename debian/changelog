@@ -1,3 +1,12 @@
+libsamplerate (0.1.8-8+deb8u1) jessie-security; urgency=high
+
+  * Non-maintainer upload by the ELTS Team.
+  * CVE-2017-7697
+    Using a crafted audio file a buffer over-read might happen in 
+    calc_output_single() in src_sinc.c 
+
+ -- Thorsten Alteholz <debian@alteholz.de>  Sun, 12 Dec 2021 22:03:02 +0100
+
 libsamplerate (0.1.8-8) unstable; urgency=low
 
   * debian/rules: Regenerate configure if needed. Patch from Svante Signell.
